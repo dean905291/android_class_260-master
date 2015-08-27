@@ -6,12 +6,14 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText inputText;
+    private CheckBox hide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,16 +26,21 @@ public class MainActivity extends AppCompatActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event){
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
                     submit(v);
+                    return true;
                 }
                 return false;
             }
         });
+        hide = (CheckBox) findViewById(R.id.checkBox);
     }
 
     public void submit(View view){
         String text = inputText.getText().toString();
+        if (hide.isChecked()) {
+            text = "************";
+        }
         inputText.setText("");
-        Toast.makeText(this, text, Toast.LENGTH_LONG);
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
     @Override
