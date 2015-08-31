@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="store_info">
+    <item> 南機場 台北市中華路 2 段 313 巷 2 號 </item>
+    <item> 忠孝 SOGO 臺北市大安區忠孝東路四段 49 巷 8 號 </item>
+    <item> 衡陽 台北市中正區衡陽路 85 之 1 號 </item>
+    <item> 南陽 台北市中正區南陽街 4 號 1 樓 </item>
+    <item> 汀洲 台北市中正區羅斯福路四段 136 巷 6 號 </item>
+    <item> 台北錦州 台北市錦州街 242 號 </item>
+    <item> 國賓 北市中山區長春路 172 號 </item>
+</string-array>
+</resources>
