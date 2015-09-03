@@ -4,13 +4,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class DrinkMenuActivity extends AppCompatActivity {
+
+    private TextView storeInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drink_menu);
+        //建立textView的內容關聯
+        storeInfo = (TextView) findViewById(R.id.storeInfo);
+        //建立內容的來源
+        String storeInfoStr = getIntent().getStringExtra("store_info");
+        //將來源貼上
+        storeInfo.setText(storeInfoStr);
     }
 
     @Override

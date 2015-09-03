@@ -104,9 +104,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToDrinkMenu(View view){
+        //建立要帶走的店鋪資料，從spinner取得
+        String storeInfoString = (String)storeInfo.getSelectedItem();
+
         //建立動作的意圖，讓intent知道我們要去哪
         Intent intent = new Intent();
         intent.setClass(this, DrinkMenuActivity.class);
+        //將店鋪資料交給intent
+        intent.putExtra("store_info", storeInfoString);
+        //執行intent
         startActivity(intent);
     }
 
