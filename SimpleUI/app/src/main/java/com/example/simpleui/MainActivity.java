@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_DRINK_MENU = 1;
     private EditText inputText;
     private CheckBox hide;
     private ListView history;
@@ -92,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void submit(View view){
+
+
+
         String text = inputText.getText().toString();
         if (hide.isChecked()) {
             text = "************";
@@ -113,7 +118,20 @@ public class MainActivity extends AppCompatActivity {
         //將店鋪資料交給intent
         intent.putExtra("store_info", storeInfoString);
         //執行intent
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_DRINK_MENU);
+    }
+    //按COMMAN + N可以Generate Method
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //建立接收reuslt from DrinkMenuActivity的Method，利用resultCode和requestCode
+        if (requestCode == REQUEST_DRINK_MENU){
+            if (resultCode == RESULT_OK){
+                String result = data.getStringExtra("result");
+                Log.d("debug", result);
+            }
+        }
+
     }
 
     @Override

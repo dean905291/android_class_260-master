@@ -1,5 +1,6 @@
 package com.example.simpleui;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,7 +38,7 @@ public class DrinkMenuActivity extends AppCompatActivity {
     }
 
     private JSONArray getValue() {
-        //取得飲料定單資料
+        //取得飲料定單資料並建立JSON檔 利用將COMPONENT GROUP起來(命名為root)，
         JSONArray result = new JSONArray();
         LinearLayout root = (LinearLayout) findViewById(R.id.root);
 
@@ -63,7 +64,11 @@ public class DrinkMenuActivity extends AppCompatActivity {
         return result;
     }
     public void done (View view){
-        Log.d("debug", getValue().toString());
+        // 將按上DONE後，執行Intent data的動作，並傳送result到MainActivity
+
+        Intent data = new Intent();
+        data.putExtra("result", getValue().toString());
+        setResult(RESULT_OK, data);
         finish();
     }
 
