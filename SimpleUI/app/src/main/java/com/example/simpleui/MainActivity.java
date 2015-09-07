@@ -19,6 +19,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_DRINK_MENU = 1;
@@ -29,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+
+    private String drinkMenuResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,10 +99,22 @@ public class MainActivity extends AppCompatActivity {
         history.setAdapter(adapter);
     }
 
+    private JSONObject pack(){
+
+        JSONObject object = new JSONObject();
+        try {
+            object.put("note", inputText.getText().toString());
+            object.put("store_info", (String) storeInfo.getSelectedItem());
+            if(drinkMenuResult != null)
+                object.put("menu", new JSONArray(drinkMenuResult));
+            return object;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public void submit(View view){
-
-
-
         String text = inputText.getText().toString();
         if (hide.isChecked()) {
             text = "************";
@@ -104,8 +122,11 @@ public class MainActivity extends AppCompatActivity {
         inputText.setText("");
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
-        Utils.writeFile(this, "history.txt", text + "\n");
+        Utils.writeFile(this, "history.txt", pack().toString() + "\n");
         loadHistory();
+
+        inputText.setText("");
+        drinkMenuResult = null;
     }
 
     public void goToDrinkMenu(View view){
