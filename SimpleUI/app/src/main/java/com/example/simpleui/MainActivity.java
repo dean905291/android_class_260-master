@@ -19,12 +19,14 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,53 +102,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadHistory() {
-        String result = Utils.readFile(this, "history.txt");
-        String[] rawData = result.split("\n");
-//        TextView history = (TextView) findViewById(R.id.history);
-//        history.setText(result);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, data);
 
-        List<Map<String, String>> data = new ArrayList<>();
-        for (int i = 0; i < rawData.length; i++){
-            try{
-                JSONObject object = new JSONObject(rawData[i]);
-                String note = object.getString("note");
-                String storeInfo = object.getString("store_info");
-                JSONArray menu = object.getJSONArray("menu");
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+                    List<Map<String, String>> data = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        ParseObject object = list.get(i);
+                        String note = object.getString("note");
+                        String storeInfo = object.getString("store_info");
+                        JSONArray menu = object.getJSONArray("menu");
 
-                Map<String, String> item = new HashMap<>();
-                item.put("note", note);
-                item.put("store_info", storeInfo);
-                item.put("sum", "5");
+                        Map<String, String> item = new HashMap<>();
+                        item.put("note", note);
+                        item.put("store_info", storeInfo);
+                        item.put("sum", "5");
 
-                data.add(item);
-            }catch (JSONException e){
-                e.printStackTrace();
+                        data.add(item);
+                    }
+                    String[] from = new String[]{"note", "store_info", "sum"};
+                    int[] to = new int[]{R.id.note, R.id.store_info, R.id.sum};
+                    SimpleAdapter adapter = new SimpleAdapter(MainActivity.this,
+                            data, R.layout.listview_item, from, to);
+
+                    history.setAdapter(adapter);
+                }
             }
-        }
-
-        String[] from = new String[]{"note", "store_info", "sum"};
-        int[] to = new int[] {R.id.note, R.id.store_info, R.id.sum};
-        SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_item, from, to);
-
-
-        history.setAdapter(adapter);
+        });
     }
 
-    private JSONObject pack(){
-        try {
-            JSONObject object = new JSONObject();
-            object.put("note", inputText.getText().toString());
-            object.put("store_info", (String) storeInfo.getSelectedItem());
-            if(drinkMenuResult != null)
-                object.put("menu", new JSONArray(drinkMenuResult));
-            return object;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private void saveOrder(){
         ParseObject object = new ParseObject("Order");
