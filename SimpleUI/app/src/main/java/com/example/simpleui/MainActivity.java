@@ -52,10 +52,6 @@ public class MainActivity extends AppCompatActivity {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "GDjBVIr7diXiQ1TIMQgsEIE00GhW5358hZoTJxcC", "jj4gsZqVqDGMPXOqPLbiBnxstHO9PUbHB8NGaBYz");
 
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-
         sp = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sp.edit();
 
@@ -152,15 +148,30 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    private void saveOrder(){
+        ParseObject object = new ParseObject("Order");
+        object.put("note", inputText.getText().toString());
+        object.put("store_info", (String) storeInfo.getSelectedItem());
+        if (drinkMenuResult != null){
+            try{
+                object.put("menu", new JSONArray(drinkMenuResult));
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+        object.saveInBackground();
+    }
+
     public void submit(View view){
         String text = inputText.getText().toString();
         if (hide.isChecked()) {
             text = "************";
         }
-        inputText.setText("");
+        //inputText.setText("");
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
-        Utils.writeFile(this, "history.txt", pack().toString() + "\n");
+        //Utils.writeFile(this, "history.txt", pack().toString() + "\n");
+        saveOrder();
         loadHistory();
 
         inputText.setText("");
