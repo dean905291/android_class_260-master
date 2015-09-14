@@ -25,6 +25,7 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     private String drinkMenuResult;
+    private List<ParseObject> orderResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,12 @@ public class MainActivity extends AppCompatActivity {
         hide.setChecked(sp.getBoolean("hide", false));
 
         history = (ListView) findViewById(R.id.history);
+        history.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                goToOrderDetail(position);
+            }
+        });
         storeInfo = (Spinner) findViewById(R.id.spinner);
 
         loadHistory();
@@ -95,11 +103,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadStoreInfo(){
-        String[] data = getResources().getStringArray(R.array.store_info);
+       ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                String[] data = new String[list.size()];
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, data);
-        storeInfo.setAdapter(adapter);
+                for (int i = 0; i < list.size(); i++) {
+                    ParseObject object = list.get(i);
+                    data[i] = object.getString("name") + " " + object.getString("address");
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                        android.R.layout.simple_spinner_item, data);
+                storeInfo.setAdapter(adapter);
+            }
+        });
     }
 
     private void loadHistory() {
@@ -135,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void saveOrder(){
+    private void saveOrder(SaveCallback saveCallback){
         ParseObject object = new ParseObject("Order");
         object.put("note", inputText.getText().toString());
         object.put("store_info", (String) storeInfo.getSelectedItem());
@@ -146,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        object.saveInBackground();
+        object.saveInBackground(saveCallback);
     }
 
     public void submit(View view){
@@ -158,11 +177,27 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
         //Utils.writeFile(this, "history.txt", pack().toString() + "\n");
-        saveOrder();
-        loadHistory();
+        saveOrder(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                loadHistory();
+            }
+        });
 
         inputText.setText("");
         drinkMenuResult = null;
+    }
+
+    public  void goToOrderDetail(int position){
+
+        ParseObject order = orderResult.get(position);
+
+        Intent intent = new Intent();
+        intent.setClass(this, OrderDetailActivity.class);
+        intent.putExtra("note", order.getString("note"));
+        intent.putExtra("store_info", order.getString("store_info"));
+        intent.putExtra("menu", order.getJSONArray("menu").toString());
+        startActivity(intent);
     }
 
     public void goToDrinkMenu(View view){
